@@ -1,0 +1,19 @@
+steps:
+
+  # build the container image
+- name: "gcr.io/cloud-builders/docker"
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/enhancedimage-dev:${BUILD_ID}', '.']
+
+  # push the container image
+- name : 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/enhancedimage-dev:${BUILD_ID}']
+
+  # deploy the container image to GKE
+- name: 'gcr.io/cloud-builders/gke-deploy'
+  args:
+    - run
+    - --filename=app-deployment.yml
+    - --image=gcr.io/$PROJECT_ID/enhancedimage-dev:${BUILD_ID}
+    - --location=us-central1-c
+    - --cluster=privatecluster
+    - --namespace=gcp-project2-dev
